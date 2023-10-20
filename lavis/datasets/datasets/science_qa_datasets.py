@@ -6,6 +6,7 @@ from lavis.datasets.datasets.base_dataset import BaseDataset
 import torch
 from PIL import Image
 
+
 class __DisplMixin:
     def displ_item(self, index):
         sample, ann = self.__getitem__(index), self.annotation[index]
@@ -21,14 +22,16 @@ class __DisplMixin:
             }
         )
 
+
 class ScienceQADataset(BaseDataset, __DisplMixin):
     def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
-        
 
     def _build_choices_string(self, choices):
-        return " ".join([f'({chr(i + ord("A"))}) {choice}' for i, choice in enumerate(choices)])
-    
+        return " ".join(
+            [f'({chr(i + ord("A"))}) {choice}' for i, choice in enumerate(choices)]
+        )
+
     def __getitem__(self, index):
         ann = self.annotation[index]
 
@@ -55,21 +58,24 @@ class ScienceQADataset(BaseDataset, __DisplMixin):
 
         for sample in samples:
             image_list.append(sample["image"])
-            text_input_list.append(self.prompt.format(
-                sample["context"],
-                sample["question"],
-                sample["choices"],
-            ))
+            text_input_list.append(
+                self.prompt.format(
+                    sample["context"],
+                    sample["question"],
+                    sample["choices"],
+                )
+            )
             answer_list.append(f'({chr(ord("A") + sample["answer_idx"][0])})')
             weight_list += [1]
-        
+
         return {
             "image": torch.stack(image_list, dim=0),
             "text_input": text_input_list,
             "answer": answer_list,
             "weight": weight_list,
         }
-    
+
+
 class ScienceQAEvalDataset(ScienceQADataset, __DisplMixin):
     def collater(self, samples):
         (
@@ -81,11 +87,13 @@ class ScienceQAEvalDataset(ScienceQADataset, __DisplMixin):
 
         for sample in samples:
             image_list.append(sample["image"])
-            text_input_list.append((
-                sample["context"],
-                sample["question"],
-                sample["choices"],
-            ))
+            text_input_list.append(
+                (
+                    sample["context"],
+                    sample["question"],
+                    sample["choices"],
+                )
+            )
             question_id_list.append(sample["question_id"])
             answer_list.append(sample["answer_idx"])
 
