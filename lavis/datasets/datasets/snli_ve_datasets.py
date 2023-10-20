@@ -29,8 +29,8 @@ class __DisplMixin:
 
 
 class SNLIVisualEntialmentDataset(MultimodalClassificationDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
         self.class_labels = self._build_class_labels()
 

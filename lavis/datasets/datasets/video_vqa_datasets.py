@@ -27,8 +27,8 @@ class __DisplMixin:
 
 
 class VideoQADataset(MultimodalClassificationDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
     def _build_class_labels(self, ans_path):
         ans2label = json.load(open(ans_path))

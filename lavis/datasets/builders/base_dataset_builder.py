@@ -216,6 +216,8 @@ class BaseDatasetBuilder:
             # visual data storage path
             vis_path = vis_info.storage
 
+            prompt = None if "prompt" not in self.config.__dict__ else self.config.prompt
+
             if not os.path.isabs(vis_path):
                 # vis_path = os.path.join(utils.get_cache_path(), vis_path)
                 vis_path = utils.get_cache_path(vis_path)
@@ -230,6 +232,7 @@ class BaseDatasetBuilder:
                 text_processor=text_processor,
                 ann_paths=ann_paths,
                 vis_root=vis_path,
+                prompt=prompt,
             )
 
         return datasets

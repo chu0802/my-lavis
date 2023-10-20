@@ -31,8 +31,8 @@ class __DisplMixin:
 
 
 class COCOVQADataset(VQADataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
     def __getitem__(self, index):
         ann = self.annotation[index]
@@ -62,7 +62,7 @@ class COCOVQADataset(VQADataset, __DisplMixin):
 
 
 class COCOVQAEvalDataset(VQAEvalDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file

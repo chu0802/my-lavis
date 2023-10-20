@@ -30,7 +30,7 @@ class __DisplMixin:
 
 
 class DialogueDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -86,7 +86,7 @@ class DialogueDataset(BaseDataset, __DisplMixin):
 
 
 class DialogueEvalDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file

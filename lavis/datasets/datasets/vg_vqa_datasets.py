@@ -13,8 +13,8 @@ from lavis.datasets.datasets.vqa_datasets import VQADataset
 
 
 class VGVQADataset(VQADataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
     def __getitem__(self, index):
         ann = self.annotation[index]

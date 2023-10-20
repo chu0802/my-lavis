@@ -14,7 +14,7 @@ from torch.utils.data.dataloader import default_collate
 
 class BaseDataset(Dataset):
     def __init__(
-        self, vis_processor=None, text_processor=None, vis_root=None, ann_paths=[]
+        self, vis_processor=None, text_processor=None, vis_root=None, ann_paths=[], prompt=None
     ):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
@@ -28,6 +28,7 @@ class BaseDataset(Dataset):
 
         self.vis_processor = vis_processor
         self.text_processor = text_processor
+        self.prompt = prompt
 
         self._add_instance_ids()
 

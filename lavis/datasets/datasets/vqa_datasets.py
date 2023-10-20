@@ -11,8 +11,8 @@ from lavis.datasets.datasets.base_dataset import BaseDataset
 
 
 class VQADataset(BaseDataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
     def collater(self, samples):
         image_list, question_list, answer_list, weight_list = [], [], [], []
@@ -40,5 +40,5 @@ class VQADataset(BaseDataset):
 
 
 class VQAEvalDataset(BaseDataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
-        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
