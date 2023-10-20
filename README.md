@@ -2,4 +2,4 @@
 
 ---
 
-click [here](https://github.com/salesforce/LAVIS) to check the original project.
+click [here](https://github.com/salesforce/LAVIS) to see the original project.
