@@ -12,6 +12,10 @@ from lavis.datasets.datasets.aok_vqa_datasets import AOKVQADataset, AOKVQAEvalDa
 from lavis.datasets.datasets.coco_vqa_datasets import COCOVQADataset, COCOVQAEvalDataset
 from lavis.datasets.datasets.vg_vqa_datasets import VGVQADataset
 from lavis.datasets.datasets.gqa_datasets import GQADataset, GQAEvalDataset
+from lavis.datasets.datasets.science_qa_datasets import ScienceQADataset, ScienceQAEvalDataset
+
+
+
 
 
 @registry.register_builder("coco_vqa")
@@ -55,4 +59,13 @@ class GQABuilder(BaseDatasetBuilder):
         "default": "configs/datasets/gqa/defaults.yaml",
         "balanced_val": "configs/datasets/gqa/balanced_val.yaml",
         "balanced_testdev": "configs/datasets/gqa/balanced_testdev.yaml",
+    }
+
+@registry.register_builder("science_qa")
+class ScienceQABuilder(BaseDatasetBuilder):
+    train_dataset_cls = ScienceQADataset
+    eval_dataset_cls = ScienceQAEvalDataset
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/science_qa/defaults.yaml",
     }

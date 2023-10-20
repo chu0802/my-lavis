@@ -312,3 +312,59 @@ class AOKVQATask(VQATask):
             json.dump(result_leaderboard, f)
 
         logging.info(f"Saved results for leaderboard evaluation at {result_file}")
+
+@registry.register_task("science_qa")
+class ScienceQATask(VQATask):
+    def parse_answer(self, answer):
+        if len(answer) == 0:
+            return -1
+        answer = answer.split()[0].strip('()').lower()
+        if len(answer) > 1:
+            return -1
+        return ord(answer.lower()) - ord('a')
+
+    def valid_step(self, model, samples):
+        answers = model.predict_answers(
+            samples=samples,
+            answer_list=self.answer_list,
+            inference_method=self.inference_method,
+            num_beams=self.num_beams,
+            max_len=self.max_len,
+            min_len=self.min_len,
+            num_ans_candidates=self.num_ans_candidates,
+            prompt=self.prompt,
+        )
+
+        pred_qa_pairs = []
+
+        question_id = samples["question_id"]
+        gt_answers = samples["answer_idx"]
+        
+        for answer, ques_id, gt_answer in zip(answers, question_id, gt_answers):
+            process_answer = self.parse_answer(answer)
+            ques_id = int(ques_id)
+            pred_qa_pairs.append({"question_id": ques_id, "org_pred_ans": answer, "pred_ans": process_answer, "gt_ans": gt_answer[0]})
+
+        return pred_qa_pairs
+    
+    @dist_utils.main_process
+    def _report_metrics(self, result_file, split):
+        results = json.load(open(result_file, "r"))
+        acc = []
+
+        for res in results:
+            pred = res["pred_ans"]
+            gt_ans = res["gt_ans"]
+            acc.append(int(pred == gt_ans))
+
+        accuracy = sum(acc) / len(acc) * 100
+        metrics = {"agg_metrics": accuracy, "acc": accuracy}
+
+        with open(
+            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
+        ) as f:
+            f.write(json.dumps(metrics) + "\n")
+
+        logging.info(metrics)
+
+        return metrics
