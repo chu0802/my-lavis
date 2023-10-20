@@ -2,4 +2,4 @@
 
 ---
 
-check [here](lavis-readme.md) to see the original project page.
+click [here](https://github.com/salesforce/LAVIS) to check the original project.
