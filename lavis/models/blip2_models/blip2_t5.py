@@ -128,21 +128,46 @@ class Blip2T5(Blip2Base):
                 return_tensors="pt",
             ).to(image.device)
             output_tokens = self.t5_tokenizer(
-                samples["text_output"],
+                samples["answer"],
                 padding="longest",
                 truncation=True,
                 max_length=self.max_txt_len,
                 return_tensors="pt",
             ).to(image.device)
 
-            encoder_atts = torch.cat([atts_t5, input_tokens.attention_mask], dim=1)
 
+
+            batch_input_tokens_input_ids = []
+            batch_input_tokens_atts = []
+            batch_atts_t5 = []
+            batch_inputs_t5 = []
+
+
+            if "n_answers" in samples:
+                for b, n in enumerate(samples["n_answers"]):
+                    batch_input_tokens_input_ids += [input_tokens.input_ids[b]] * n
+                    batch_input_tokens_atts += [input_tokens.attention_mask[b]] * n
+                    batch_atts_t5 += [atts_t5[b]] * n
+                    batch_inputs_t5 += [inputs_t5[b]] * n
+
+                    batch_input_tokens_input_ids = torch.stack(batch_input_tokens_input_ids, dim=0)
+                    batch_input_tokens_atts = torch.stack(batch_input_tokens_atts, dim=0)
+                    batch_atts_t5 = torch.stack(batch_atts_t5, dim=0)
+                    batch_inputs_t5 = torch.stack(batch_inputs_t5, dim=0)
+
+            else:
+                batch_input_tokens_input_ids = input_tokens.input_ids
+                batch_input_tokens_atts = input_tokens.attention_mask
+                batch_atts_t5 = atts_t5
+                batch_inputs_t5 = inputs_t5
+
+            encoder_atts = torch.cat([batch_atts_t5, batch_input_tokens_atts], dim=1)
             targets = output_tokens.input_ids.masked_fill(
                 output_tokens.input_ids == self.t5_tokenizer.pad_token_id, -100
             )
 
-            inputs_embeds = self.t5_model.encoder.embed_tokens(input_tokens.input_ids)
-            inputs_embeds = torch.cat([inputs_t5, inputs_embeds], dim=1)
+            inputs_embeds = self.t5_model.encoder.embed_tokens(batch_input_tokens_input_ids)
+            inputs_embeds = torch.cat([batch_inputs_t5, inputs_embeds], dim=1)
 
             outputs = self.t5_model(
                 inputs_embeds=inputs_embeds,
@@ -279,7 +304,7 @@ class Blip2T5(Blip2Base):
         if isinstance(samples["text_input"], str):
             samples["text_input"] = [samples["text_input"]]
         if prompt:
-            text_input = [prompt.format(question) for question in samples["text_input"]]
+            text_input = [prompt.format(*question if isinstance(question, tuple) else question) for question in samples["text_input"]]
         else:
             text_input = samples["text_input"]
 
