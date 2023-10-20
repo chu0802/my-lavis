@@ -166,7 +166,7 @@ For example, for the AVSD dataset, we want to define a new dataset subclass ``Di
     import copy 
 
     class DialogueDataset(BaseDataset):
-        def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+        def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
             """
             vis_processor (string): visual processor 
             text_processor (string): textual processor 
@@ -213,7 +213,7 @@ The dataset class can then be defined as:
 .. code-block:: python
 
     class DialogueEvalDataset(BaseDataset):
-        def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+        def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
             # ...
             # defined similarly as DialogueDataset above 
             # except for the loading of dialogue annotation data            
@@ -249,9 +249,9 @@ We can define a new class ``AVSDDialDataset`` that further specifies how to load
     import torch 
         
     class AVSDDialDataset(DialogueDataset):
-        def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
+        def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
 
-            super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+            super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
     
         def __getitem__(self, index):
     
