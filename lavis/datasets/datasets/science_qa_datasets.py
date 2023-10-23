@@ -50,6 +50,7 @@ class ScienceQADataset(BaseDataset, __DisplMixin):
             "context": context,
             "choices": choices,
             "answer_idx": [ann["answer"]],
+            "direct_answer": ann["choices"][ann["answer"]],
             "weights": [1],
         }
 
@@ -65,7 +66,8 @@ class ScienceQADataset(BaseDataset, __DisplMixin):
                     sample["choices"],
                 )
             )
-            answer_list.append(f'({chr(ord("A") + sample["answer_idx"][0])})')
+            answer_list.append(sample["direct_answer"])
+            # answer_list.append(f'({chr(ord("A") + sample["answer_idx"][0])})' + sample["direct_answer"])
             weight_list += [1]
 
         return {
@@ -83,7 +85,8 @@ class ScienceQAEvalDataset(ScienceQADataset, __DisplMixin):
             text_input_list,
             question_id_list,
             answer_list,
-        ) = ([], [], [], [])
+            direct_answer_list,
+        ) = ([], [], [], [], [])
 
         for sample in samples:
             image_list.append(sample["image"])
@@ -96,10 +99,12 @@ class ScienceQAEvalDataset(ScienceQADataset, __DisplMixin):
             )
             question_id_list.append(sample["question_id"])
             answer_list.append(sample["answer_idx"])
+            direct_answer_list.append(sample["direct_answer"])
 
         return {
             "image": torch.stack(image_list, dim=0),
             "text_input": text_input_list,
             "question_id": question_id_list,
             "answer_idx": answer_list,
+            "direct_answer": direct_answer_list,
         }

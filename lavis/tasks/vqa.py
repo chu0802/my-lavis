@@ -166,6 +166,7 @@ class VQATask(BaseTask):
 
         return metrics
 
+
 @registry.register_task("gqa")
 class GQATask(VQATask):
     def valid_step(self, model, samples):
@@ -183,13 +184,15 @@ class GQATask(VQATask):
 
         question_id = samples["question_id"]
         gt_answers = samples["answer"]
-        
+
         for answer, ques_id, gt_answer in zip(answers, question_id, gt_answers):
             ques_id = int(ques_id.item())
-            pred_qa_pairs.append({"question_id": ques_id, "pred_ans": answer, "gt_ans": gt_answer})
+            pred_qa_pairs.append(
+                {"question_id": ques_id, "pred_ans": answer, "gt_ans": gt_answer}
+            )
 
         return pred_qa_pairs
-        
+
     @dist_utils.main_process
     def _report_metrics(self, result_file, split):
         """
@@ -228,7 +231,7 @@ class GQATask(VQATask):
         logging.info(metrics)
 
         return metrics
-        
+
 
 @registry.register_task("aok_vqa")
 class AOKVQATask(VQATask):
@@ -313,15 +316,16 @@ class AOKVQATask(VQATask):
 
         logging.info(f"Saved results for leaderboard evaluation at {result_file}")
 
+
 @registry.register_task("science_qa")
 class ScienceQATask(VQATask):
     def parse_answer(self, answer):
         if len(answer) == 0:
             return -1
-        answer = answer.split()[0].strip('()').lower()
+        answer = answer.split()[0].strip("()").lower()
         if len(answer) > 1:
             return -1
-        return ord(answer.lower()) - ord('a')
+        return ord(answer.lower()) - ord("a")
 
     def valid_step(self, model, samples):
         answers = model.predict_answers(
@@ -339,23 +343,36 @@ class ScienceQATask(VQATask):
 
         question_id = samples["question_id"]
         gt_answers = samples["answer_idx"]
-        
-        for answer, ques_id, gt_answer in zip(answers, question_id, gt_answers):
+        direct_answers = samples["direct_answer"]
+
+        for answer, ques_id, gt_answer, direct_answer in zip(
+            answers, question_id, gt_answers, direct_answers
+        ):
             process_answer = self.parse_answer(answer)
             ques_id = int(ques_id)
-            pred_qa_pairs.append({"question_id": ques_id, "org_pred_ans": answer, "pred_ans": process_answer, "gt_ans": gt_answer[0]})
+            pred_qa_pairs.append(
+                {
+                    "question_id": ques_id,
+                    "org_pred_ans": answer,
+                    "pred_ans": process_answer,
+                    "gt_ans_idx": gt_answer[0],
+                    "gt_direct_answer": direct_answer,
+                }
+            )
 
         return pred_qa_pairs
-    
+
     @dist_utils.main_process
     def _report_metrics(self, result_file, split):
         results = json.load(open(result_file, "r"))
         acc = []
 
         for res in results:
+            org_pred = res["org_pred_ans"]
             pred = res["pred_ans"]
-            gt_ans = res["gt_ans"]
-            acc.append(int(pred == gt_ans))
+            gt_ans = res["gt_ans_idx"]
+            direct_answer = res["gt_direct_answer"]
+            acc.append(int((direct_answer in org_pred) or (pred == gt_ans)))
 
         accuracy = sum(acc) / len(acc) * 100
         metrics = {"agg_metrics": accuracy, "acc": accuracy}
