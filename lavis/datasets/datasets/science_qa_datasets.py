@@ -59,13 +59,16 @@ class ScienceQADataset(BaseDataset, __DisplMixin):
 
         for sample in samples:
             image_list.append(sample["image"])
-            text_input_list.append(
-                self.prompt.format(
-                    sample["context"],
-                    sample["question"],
-                    sample["choices"],
-                )
-            )
+            # text_input_list.append(
+            #     self.prompt.format(
+            #         sample["context"],
+            #         sample["question"],
+            #         sample["choices"],
+            #     )
+            # )
+
+            # direct tuning with the original question
+            text_input_list.append(sample["question"])
             answer_list.append(sample["direct_answer"])
             # answer_list.append(f'({chr(ord("A") + sample["answer_idx"][0])})' + sample["direct_answer"])
             weight_list += [1]
