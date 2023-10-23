@@ -76,12 +76,12 @@ class BaseDatasetBuilder:
 
             self.text_processors["train"] = self._build_proc_from_cfg(txt_train_cfg)
             self.text_processors["eval"] = self._build_proc_from_cfg(txt_eval_cfg)
-        
+
         kw_proc_cfg = self.config.get("kw_processor")
         if kw_proc_cfg is not None:
             for name, cfg in kw_proc_cfg.items():
                 self.kw_processors[name] = self._build_proc_from_cfg(cfg)
-        
+
     @staticmethod
     def _build_proc_from_cfg(cfg):
         return (
@@ -156,7 +156,6 @@ class BaseDatasetBuilder:
                     download_url(url=url_or_filename, root=dirname, filename=filename)
 
     def _download_vis(self):
-
         storage_path = self.config.build_info.get(self.data_type).storage
         storage_path = utils.get_cache_path(storage_path)
 
@@ -216,7 +215,7 @@ class BaseDatasetBuilder:
             # visual data storage path
             vis_path = vis_info.storage
 
-            prompt = None if "prompt" not in self.config.__dict__ else self.config.prompt
+            prompt = None if "prompt" not in self.config else self.config["prompt"]
 
             if not os.path.isabs(vis_path):
                 # vis_path = os.path.join(utils.get_cache_path(), vis_path)
