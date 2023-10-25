@@ -45,6 +45,7 @@ class Blip2T5(Blip2Base):
         use_grad_checkpoint=False,
         vit_precision="fp16",
         freeze_vit=True,
+        freeze_qformer=False,
         num_query_token=32,
         t5_model="google/flan-t5-xl",
         prompt="",
@@ -77,6 +78,17 @@ class Blip2T5(Blip2Base):
         for layer in self.Qformer.bert.encoder.layer:
             layer.output = None
             layer.intermediate = None
+
+        # freeze the q-former
+        if freeze_qformer:
+            self.query_tokens.requires_grad = False
+
+            for name, param in self.Qformer.named_parameters():
+                param.requires_grad = False
+
+            self.Qformer.eval()
+            self.Qformer.train = disabled_train
+            logging.info("freeze Qformer")
 
         self.t5_tokenizer = T5TokenizerFast.from_pretrained(t5_model)
         t5_config = T5Config.from_pretrained(t5_model)
@@ -135,13 +147,10 @@ class Blip2T5(Blip2Base):
                 return_tensors="pt",
             ).to(image.device)
 
-
-
             batch_input_tokens_input_ids = []
             batch_input_tokens_atts = []
             batch_atts_t5 = []
             batch_inputs_t5 = []
-
 
             if "n_answers" in samples:
                 for b, n in enumerate(samples["n_answers"]):
@@ -150,10 +159,12 @@ class Blip2T5(Blip2Base):
                     batch_atts_t5 += [atts_t5[b]] * n
                     batch_inputs_t5 += [inputs_t5[b]] * n
 
-                    batch_input_tokens_input_ids = torch.stack(batch_input_tokens_input_ids, dim=0)
-                    batch_input_tokens_atts = torch.stack(batch_input_tokens_atts, dim=0)
-                    batch_atts_t5 = torch.stack(batch_atts_t5, dim=0)
-                    batch_inputs_t5 = torch.stack(batch_inputs_t5, dim=0)
+                batch_input_tokens_input_ids = torch.stack(
+                    batch_input_tokens_input_ids, dim=0
+                )
+                batch_input_tokens_atts = torch.stack(batch_input_tokens_atts, dim=0)
+                batch_atts_t5 = torch.stack(batch_atts_t5, dim=0)
+                batch_inputs_t5 = torch.stack(batch_inputs_t5, dim=0)
 
             else:
                 batch_input_tokens_input_ids = input_tokens.input_ids
@@ -166,7 +177,9 @@ class Blip2T5(Blip2Base):
                 output_tokens.input_ids == self.t5_tokenizer.pad_token_id, -100
             )
 
-            inputs_embeds = self.t5_model.encoder.embed_tokens(batch_input_tokens_input_ids)
+            inputs_embeds = self.t5_model.encoder.embed_tokens(
+                batch_input_tokens_input_ids
+            )
             inputs_embeds = torch.cat([batch_inputs_t5, inputs_embeds], dim=1)
 
             outputs = self.t5_model(
@@ -304,7 +317,14 @@ class Blip2T5(Blip2Base):
         if isinstance(samples["text_input"], str):
             samples["text_input"] = [samples["text_input"]]
         if prompt:
-            text_input = [prompt.format(*question if isinstance(question, tuple) else question) for question in samples["text_input"]]
+            if type(samples["text_input"][0]) in [tuple, list]:
+                text_input = [
+                    prompt.format(*question) for question in samples["text_input"]
+                ]
+            else:
+                text_input = [
+                    prompt.format(question) for question in samples["text_input"]
+                ]
         else:
             text_input = samples["text_input"]
 
@@ -384,6 +404,7 @@ class Blip2T5(Blip2Base):
         use_grad_checkpoint = cfg.get("use_grad_checkpoint", False)
         vit_precision = cfg.get("vit_precision", "fp16")
         freeze_vit = cfg.get("freeze_vit", True)
+        freeze_qformer = cfg.get("freeze_qformer", False)
 
         prompt = cfg.get("prompt", "")
         max_txt_len = cfg.get("max_txt_len", 32)
@@ -397,6 +418,7 @@ class Blip2T5(Blip2Base):
             use_grad_checkpoint=use_grad_checkpoint,
             vit_precision=vit_precision,
             freeze_vit=freeze_vit,
+            freeze_qformer=freeze_qformer,
             num_query_token=num_query_token,
             t5_model=t5_model,
             prompt=prompt,
