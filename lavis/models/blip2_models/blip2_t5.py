@@ -322,7 +322,7 @@ class Blip2T5(Blip2Base):
                 inputs_embeds=inputs_embeds,
                 attention_mask=encoder_atts,
                 do_sample=use_nucleus_sampling,
-                top_p=top_p,
+                # top_p=top_p,
                 temperature=temperature,
                 num_beams=num_beams,
                 max_new_tokens=max_length,
