@@ -27,7 +27,7 @@ datasets:
 
 
 run:
-  task: science_qa
+  task: mcq_qa
   # optimization-specific
   lr_sched: "linear_warmup_cosine_lr"
   init_lr: 1e-3

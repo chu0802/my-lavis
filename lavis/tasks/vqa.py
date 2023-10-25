@@ -317,7 +317,7 @@ class AOKVQATask(VQATask):
         logging.info(f"Saved results for leaderboard evaluation at {result_file}")
 
 
-@registry.register_task("science_qa")
+@registry.register_task("mcq_qa")
 class ScienceQATask(VQATask):
     def parse_answer(self, answer):
         if len(answer) == 0:
@@ -355,7 +355,7 @@ class ScienceQATask(VQATask):
                     "question_id": ques_id,
                     "org_pred_ans": answer,
                     "pred_ans": process_answer,
-                    "gt_ans_idx": gt_answer[0],
+                    "gt_ans_idx": gt_answer,
                     "gt_direct_answer": direct_answer,
                 }
             )
