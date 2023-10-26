@@ -4,7 +4,7 @@ model:
   use_grad_checkpoint: False
   load_finetuned: True
   # finetuned: "/home/chuyu/vllab/blip2/my-lavis/lavis/output/BLIP2/SCIENCEQA/20231020160/checkpoint_6.pth"
-  finetuned: "/home/chuyu/vllab/blip2/my-lavis/lavis/output/BLIP2/SCIENCEQA/20231023162/checkpoint_6.pth"
+  finetuned: "/home/chuyu/vllab/blip2/my-lavis/lavis/output/BLIP2/SCIENCEQA/20231025204/checkpoint_6.pth"
 
 datasets:
   science_qa: # name of the dataset builder
