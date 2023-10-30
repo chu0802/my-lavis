@@ -46,6 +46,8 @@ class Blip2T5(Blip2Base):
         vit_precision="fp16",
         freeze_vit=True,
         freeze_qformer=False,
+        freeze_query_tokens=False,
+        freeze_self_attention=False,
         num_query_token=32,
         t5_model="google/flan-t5-xl",
         prompt="",
@@ -94,6 +96,25 @@ class Blip2T5(Blip2Base):
             self.Qformer.eval()
             self.Qformer.train = disabled_train
             logging.info("freeze Qformer")
+
+        # freeze inital query tokens
+
+        if freeze_query_tokens:
+            self.query_tokens.requires_grad = False
+            logging.info("freeze query tokens")
+        # freeze self attention layer
+
+        if freeze_self_attention:
+            num_layers = self.Qformer.bert.encoder.config.num_hidden_layers
+            for i in range(num_layers):
+                bert_self_attention_layer = self.Qformer.bert.encoder.layer[i].attention
+
+                for name, param in bert_self_attention_layer.named_parameters():
+                    param.requires_grad = False
+
+                bert_self_attention_layer.eval()
+                bert_self_attention_layer.train = disabled_train
+            logging.info("freeze self attention layer")
 
         self.t5_tokenizer = T5TokenizerFast.from_pretrained(t5_model)
         t5_config = T5Config.from_pretrained(t5_model)
@@ -415,6 +436,9 @@ class Blip2T5(Blip2Base):
         freeze_vit = cfg.get("freeze_vit", True)
         freeze_qformer = cfg.get("freeze_qformer", False)
 
+        freeze_query_tokens = cfg.get("freeze_query_tokens", False)
+        freeze_self_attention = cfg.get("freeze_self_attention", False)
+
         prompt = cfg.get("prompt", "")
         max_txt_len = cfg.get("max_txt_len", 32)
 
@@ -430,6 +454,8 @@ class Blip2T5(Blip2Base):
             vit_precision=vit_precision,
             freeze_vit=freeze_vit,
             freeze_qformer=freeze_qformer,
+            freeze_query_tokens=freeze_query_tokens,
+            freeze_self_attention=freeze_self_attention,
             num_query_token=num_query_token,
             t5_model=t5_model,
             prompt=prompt,
