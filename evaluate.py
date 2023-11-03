@@ -28,6 +28,9 @@ from lavis.models import *
 from lavis.processors import *
 from lavis.runners.runner_base import RunnerBase
 from lavis.tasks import *
+from peft import inject_adapter_in_model, LoraConfig
+from omegaconf import OmegaConf
+from lavis.common.model_utils import print_trainable_parameters
 
 
 def parse_args():
@@ -82,6 +85,11 @@ def main():
     datasets = task.build_datasets(cfg)
     model = task.build_model(cfg)
 
+    if cfg.model_cfg.get("lora_cfg", None) is not None:
+        lora_config = LoraConfig(**OmegaConf.to_container(cfg.model_cfg.lora_cfg))
+        model = inject_adapter_in_model(lora_config, model)
+    print_trainable_parameters(model)
+    print(model)
     runner = RunnerBase(
         cfg=cfg, job_id=job_id, task=task, model=model, datasets=datasets
     )
