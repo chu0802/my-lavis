@@ -1,10 +1,5 @@
- # Copyright (c) 2022, salesforce.com, inc.
- # All rights reserved.
- # SPDX-License-Identifier: BSD-3-Clause
- # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
-
 datasets:
-  flickr30k:
+  flickr30k_caption:
     # data_dir: ${env.data_dir}/datasets
     data_type: images
 
@@ -21,4 +16,3 @@ datasets:
           storage: flickr30k/annotations/test.json
       images:
           storage: flickr30k/
-          # storage: /export/share/datasets/vision/flickr30k

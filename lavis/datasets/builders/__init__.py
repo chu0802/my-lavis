@@ -11,6 +11,7 @@ from lavis.datasets.builders.caption_builder import (
     MSRVTTCapBuilder,
     MSVDCapBuilder,
     VATEXCapBuilder,
+    Flickr30kCapBuilder,
 )
 from lavis.datasets.builders.image_text_pair_builder import (
     ConceptualCaption12MBuilder,
@@ -29,7 +30,7 @@ from lavis.datasets.builders.vqa_builder import (
     OKVQABuilder,
     VGVQABuilder,
     GQABuilder,
-    ScienceQABuilder
+    ScienceQABuilder,
 )
 from lavis.datasets.builders.retrieval_builder import (
     MSRVTTRetrievalBuilder,
@@ -38,13 +39,16 @@ from lavis.datasets.builders.retrieval_builder import (
     Flickr30kBuilder,
 )
 from lavis.datasets.builders.dialogue_builder import AVSDDialBuilder
-from lavis.datasets.builders.text_to_image_generation_builder import BlipDiffusionFinetuneBuilder
+from lavis.datasets.builders.text_to_image_generation_builder import (
+    BlipDiffusionFinetuneBuilder,
+)
 
 from lavis.common.registry import registry
 
 __all__ = [
     "BlipDiffusionFinetuneBuilder",
     "COCOCapBuilder",
+    "Flickr30kCapBuilder",
     "COCORetrievalBuilder",
     "COCOVQABuilder",
     "ConceptualCaption12MBuilder",

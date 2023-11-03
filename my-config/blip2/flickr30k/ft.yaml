@@ -1,0 +1,49 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip2_t5
+  model_type: pretrain_flant5xl
+  use_grad_checkpoint: False
+
+  prompt: "A short image description:"
+
+datasets:
+  flickr30k_caption: # name of the dataset builder
+    vis_processor:
+        eval:
+          name: "blip_image_eval"
+          image_size: 224
+    text_processor:
+        eval:
+          name: "blip_caption"
+
+run:
+  task: flickr30k_captioning
+
+  # dataloading
+  num_workers: 4
+  batch_size_train: 8
+  batch_size_eval: 8
+
+  test_splits: ["test"]
+
+  # distribution
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  use_dist_eval_sampler: False
+
+  # model specific
+  max_len: 30
+  min_len: 8
+  num_beams: 5
+
+  # misc
+  seed: 42
+  output_dir: "output/Flickr30k_Caption"
+
+  evaluate: True

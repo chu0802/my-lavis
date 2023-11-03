@@ -244,6 +244,28 @@ class Blip2T5(Blip2Base):
 
             return {"loss": loss}
 
+    def parse_text_input_for_evaluation(self, samples, prompt=""):
+        if "text_input" not in samples:
+            bs = samples["image"].size(0)
+            text_input = [
+                samples.get("prompt", prompt if prompt != "" else self.prompt)
+            ] * bs
+        else:
+            if isinstance(samples["text_input"], str):
+                samples["text_input"] = [samples["text_input"]]
+            if prompt:
+                if type(samples["text_input"][0]) in [tuple, list]:
+                    text_input = [
+                        prompt.format(*question) for question in samples["text_input"]
+                    ]
+                else:
+                    text_input = [
+                        prompt.format(question) for question in samples["text_input"]
+                    ]
+            else:
+                text_input = samples["text_input"]
+        return text_input
+
     @torch.no_grad()
     def generate(
         self,
@@ -273,20 +295,8 @@ class Blip2T5(Blip2Base):
         Returns:
             captions (list): A list of strings of length batch_size * num_captions.
         """
-        if isinstance(samples["text_input"], str):
-            samples["text_input"] = [samples["text_input"]]
-        if prompt:
-            if type(samples["text_input"][0]) in [tuple, list]:
-                text_input = [
-                    prompt.format(*question) for question in samples["text_input"]
-                ]
-            else:
-                text_input = [
-                    prompt.format(question) for question in samples["text_input"]
-                ]
-        else:
-            text_input = samples["text_input"]
 
+        text_input = self.parse_text_input_for_evaluation(samples, prompt)
         image = samples["image"]
         with self.maybe_autocast():
             image_embeds = self.ln_vision(self.visual_encoder(image))

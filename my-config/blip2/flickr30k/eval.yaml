@@ -3,22 +3,15 @@
  # SPDX-License-Identifier: BSD-3-Clause
  # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
-# Bleu_1: 0.831
-# Bleu_2: 0.689
-# Bleu_3: 0.552
-# Bleu_4: 0.434
-# METEOR: 0.316
-# ROUGE_L: 0.618
-# CIDEr: 1.451
-# SPICE: 0.251
-
 model:
   arch: blip2_t5
   model_type: caption_coco_flant5xl
   use_grad_checkpoint: False
 
+  prompt: "A short image description:"
+
 datasets:
-  coco_caption: # name of the dataset builder
+  flickr30k_caption: # name of the dataset builder
     vis_processor:
         eval:
           name: "blip_image_eval"
@@ -26,28 +19,31 @@ datasets:
     text_processor:
         eval:
           name: "blip_caption"
-#     build_info:
-#         images:
-#             storage: '/export/share/datasets/vision/coco/images/'
 
 run:
-  task: captioning
-  # optimizer
-  batch_size_train: 32
-  batch_size_eval: 16
+  task: flickr30k_captioning
+
+  # dataloading
   num_workers: 4
+  batch_size_train: 8
+  batch_size_eval: 8
 
-  max_len: 30
-  min_len: 8
-  num_beams: 5
-
-  seed: 42
-  output_dir: "output/BLIP2/Caption_coco_flant5xl"
-
-  evaluate: True
   test_splits: ["test"]
 
+  # distribution
   device: "cuda"
   world_size: 1
   dist_url: "env://"
   distributed: True
+  use_dist_eval_sampler: False
+
+  # model specific
+  max_len: 30
+  min_len: 8
+  num_beams: 5
+
+  # misc
+  seed: 42
+  output_dir: "output/Flickr30k_Caption"
+
+  evaluate: True
