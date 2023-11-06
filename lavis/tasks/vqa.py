@@ -235,7 +235,7 @@ class GQATask(VQATask):
 
 @registry.register_task("aok_vqa")
 class AOKVQATask(VQATask):
-    def valid_step(self, model, samples):
+    def valid_step(self, model, samples, ans_idx="direct_answers"):
         answers = model.predict_answers(
             samples=samples,
             answer_list=self.answer_list,
@@ -249,7 +249,7 @@ class AOKVQATask(VQATask):
         pred_qa_pairs = []
 
         question_id = samples["question_id"]
-        gt_answers = samples["direct_answers"]
+        gt_answers = samples[ans_idx]
 
         for pred_answer, ques_id, gt_answer in zip(answers, question_id, gt_answers):
             pred_qa_pairs.append(
@@ -385,3 +385,9 @@ class ScienceQATask(VQATask):
         logging.info(metrics)
 
         return metrics
+
+
+@registry.register_task("text_vqa")
+class TextVQATask(AOKVQATask):
+    def valid_step(self, model, samples):
+        return super().valid_step(model, samples, ans_idx="answers")

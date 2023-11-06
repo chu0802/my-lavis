@@ -17,6 +17,7 @@ from lavis.datasets.datasets.science_qa_datasets import (
     ScienceQAEvalDataset,
 )
 from lavis.datasets.datasets.iconqa_datasets import IconQADataset, IconQAEvalDataset
+from lavis.datasets.datasets.text_vqa_datasets import TextVQADataset, TextVQAEvalDataset
 
 
 @registry.register_builder("coco_vqa")
@@ -90,4 +91,14 @@ class IconQABuilder(BaseDatasetBuilder):
     eval_dataset_cls = IconQAEvalDataset
     DATASET_CONFIG_DICT = {
         "default": "configs/datasets/iconqa/defaults.yaml",
+    }
+
+
+@registry.register_builder("text_vqa")
+class TextVQABuilder(BaseDatasetBuilder):
+    train_dataset_cls = TextVQADataset
+    # To test on other dataset, change the eval_dataset_cls to the corresponding dataset class.
+    eval_dataset_cls = TextVQAEvalDataset
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/textvqa/defaults.yaml",
     }
