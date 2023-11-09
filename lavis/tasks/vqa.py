@@ -391,3 +391,8 @@ class ScienceQATask(VQATask):
 class TextVQATask(AOKVQATask):
     def valid_step(self, model, samples):
         return super().valid_step(model, samples, ans_idx="answers")
+
+
+@registry.register_task("vizwiz")
+class VizwizTask(TextVQATask):
+    pass

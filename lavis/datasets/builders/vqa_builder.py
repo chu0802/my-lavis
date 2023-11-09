@@ -18,6 +18,7 @@ from lavis.datasets.datasets.science_qa_datasets import (
 )
 from lavis.datasets.datasets.iconqa_datasets import IconQADataset, IconQAEvalDataset
 from lavis.datasets.datasets.text_vqa_datasets import TextVQADataset, TextVQAEvalDataset
+from lavis.datasets.datasets.vizwiz_datasets import VizwizDataset, VizwizEvalDataset
 
 
 @registry.register_builder("coco_vqa")
@@ -101,4 +102,14 @@ class TextVQABuilder(BaseDatasetBuilder):
     eval_dataset_cls = TextVQAEvalDataset
     DATASET_CONFIG_DICT = {
         "default": "configs/datasets/textvqa/defaults.yaml",
+    }
+
+
+@registry.register_builder("vizwiz")
+class VizwizBuilder(BaseDatasetBuilder):
+    train_dataset_cls = VizwizDataset
+    # To test on other dataset, change the eval_dataset_cls to the corresponding dataset class.
+    eval_dataset_cls = VizwizEvalDataset
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/vizwiz/defaults.yaml",
     }

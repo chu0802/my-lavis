@@ -32,6 +32,7 @@ from lavis.datasets.builders.vqa_builder import (
     GQABuilder,
     ScienceQABuilder,
     TextVQABuilder,
+    VizwizBuilder,
 )
 from lavis.datasets.builders.retrieval_builder import (
     MSRVTTRetrievalBuilder,
@@ -73,6 +74,7 @@ __all__ = [
     "AVSDDialBuilder",
     "ScienceQABuilder",
     "TextVQABuilder",
+    "VizwizBuilder",
 ]
 
 

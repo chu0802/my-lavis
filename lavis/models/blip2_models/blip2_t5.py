@@ -264,7 +264,14 @@ class Blip2T5(Blip2Base):
                     ]
             else:
                 text_input = samples["text_input"]
-        return text_input
+
+        if "OCR tokens" in text_input[0]:
+            qformer_input = [
+                qp.split(" Question: ")[1].split("Short answer")[0] for qp in text_input
+            ]
+        else:
+            qformer_input = text_input
+        return qformer_input, text_input
 
     @torch.no_grad()
     def generate(
@@ -296,7 +303,9 @@ class Blip2T5(Blip2Base):
             captions (list): A list of strings of length batch_size * num_captions.
         """
 
-        text_input = self.parse_text_input_for_evaluation(samples, prompt)
+        qformer_input, text_input = self.parse_text_input_for_evaluation(
+            samples, prompt
+        )
         image = samples["image"]
         with self.maybe_autocast():
             image_embeds = self.ln_vision(self.visual_encoder(image))
@@ -309,7 +318,7 @@ class Blip2T5(Blip2Base):
 
         if self.qformer_text_input:
             text_Qformer = self.tokenizer(
-                text_input,
+                qformer_input,
                 padding="longest",
                 truncation=True,
                 max_length=self.max_txt_len,

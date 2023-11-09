@@ -9,12 +9,11 @@ model:
   arch: blip2_t5
   model_type: pretrain_flant5xl
   use_grad_checkpoint: False
-  qformer_text_input: False
   # # for OKVQA evaluation
-  # apply_lemmatizer: True
+  apply_lemmatizer: True
 
 datasets:
-  text_vqa: # name of the dataset builder
+  vizwiz: # name of the dataset builder
     vis_processor:
         eval:
           name: "blip_image_eval"
@@ -24,7 +23,7 @@ datasets:
           name: "blip_question"
 
 run:
-  task: text_vqa
+  task: vizwiz
   # optimization-specific
   batch_size_train: 4
   batch_size_eval: 16
@@ -35,10 +34,10 @@ run:
   min_len: 1
   num_beams: 5
   inference_method: "generate"
-  prompt: "OCR tokens: {} Question: {} Short answer:"
+  prompt: "Question: {} Short answer:"
 
   seed: 42
-  output_dir: "output/BLIP2/TEXTVQA"
+  output_dir: "output/BLIP2/VIZWIZ"
 
   evaluate: True
   test_splits: ["val"]

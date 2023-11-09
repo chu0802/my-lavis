@@ -7,20 +7,18 @@ import torch
 from PIL import Image
 
 
-class TextVQADataset(VQADataset):
+class VizwizDataset(VQADataset):
     def __init__(self, vis_processor, text_processor, vis_root, ann_paths, prompt):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths, prompt)
 
     def __getitem__(self, index):
         ann = self.annotation[index]
 
-        image_path = os.path.join(self.vis_root, ann["images"])
+        image_path = os.path.join(self.vis_root, ann["image"])
         image = Image.open(image_path).convert("RGB")
 
         image = self.vis_processor(image)
         question = self.text_processor(ann["question"])
-        ocr_tokens = f"{', '.join(ann['ocr_tokens'][:30])}"
-
         answer_weight = {}
         for answer in ann["answers"]:
             if answer in answer_weight.keys():
@@ -33,15 +31,14 @@ class TextVQADataset(VQADataset):
 
         return {
             "image": image,
-            "image_id": ann["images_id"],
-            "ocr_tokens": ocr_tokens,
+            "image_id": ann["image_id"],
             "text_input": question,
             "answers": answers,
             "weights": weights,
         }
 
 
-class TextVQAEvalDataset(TextVQADataset):
+class VizwizEvalDataset(VizwizDataset):
     def collater(self, samples):
         (
             image_list,
@@ -52,12 +49,7 @@ class TextVQAEvalDataset(TextVQADataset):
 
         for sample in samples:
             image_list.append(sample["image"])
-            text_input_list.append(
-                (
-                    sample["ocr_tokens"],
-                    sample["text_input"],
-                )
-            )
+            text_input_list.append(sample["text_input"])
             question_id_list.append(sample["image_id"])
             answer_list.append(sample["answers"])
         return {
