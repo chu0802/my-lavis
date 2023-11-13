@@ -162,7 +162,7 @@ class VQATask(BaseTask):
             with open(
                 os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
             ) as f:
-                f.write(json.dumps(metrics) + "\n")
+                f.write(json.dumps(metrics, indent=4) + "\n")
 
         return metrics
 
@@ -380,7 +380,7 @@ class ScienceQATask(VQATask):
         with open(
             os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
         ) as f:
-            f.write(json.dumps(metrics) + "\n")
+            f.write(json.dumps(metrics, indent=4) + "\n")
 
         logging.info(metrics)
 

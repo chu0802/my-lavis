@@ -10,7 +10,12 @@ import os
 
 import torch
 import torch.distributed as dist
-from lavis.common.dist_utils import get_rank, get_world_size, is_main_process, is_dist_avail_and_initialized
+from lavis.common.dist_utils import (
+    get_rank,
+    get_world_size,
+    is_main_process,
+    is_dist_avail_and_initialized,
+)
 from lavis.common.logger import MetricLogger, SmoothedValue
 from lavis.common.registry import registry
 from lavis.datasets.data_utils import prepare_sample
@@ -63,14 +68,14 @@ class BaseTask:
     def train_step(self, model, samples):
         output = model(samples)
         loss_dict = {}
-        for k,v in output.items():
+        for k, v in output.items():
             if "loss" in k:
                 loss_dict[k] = v
         return output["loss"], loss_dict
 
     def valid_step(self, model, samples):
         raise NotImplementedError
-    
+
     def before_training(self, model, dataset, **kwargs):
         model.before_training(dataset=dataset, task_type=type(self))
 
@@ -220,7 +225,9 @@ class BaseTask:
 
             with torch.cuda.amp.autocast(enabled=use_amp):
                 loss, loss_dict = self.train_step(model=model, samples=samples)
-                loss /= accum_grad_iters #TODO: not affect loss_dict values for logging
+                loss /= (
+                    accum_grad_iters  # TODO: not affect loss_dict values for logging
+                )
 
             # after_train_step()
             if use_amp:
@@ -232,8 +239,8 @@ class BaseTask:
             if (i + 1) % accum_grad_iters == 0:
                 if use_amp:
                     scaler.step(optimizer)
-                    scaler.update()                     
-                else:    
+                    scaler.update()
+                else:
                     optimizer.step()
                 optimizer.zero_grad()
 
@@ -258,7 +265,7 @@ class BaseTask:
         )
         final_result_file = os.path.join(result_dir, "%s.json" % filename)
 
-        json.dump(result, open(result_file, "w"))
+        json.dump(result, open(result_file, "w"), indent=4)
 
         if is_dist_avail_and_initialized():
             dist.barrier()
@@ -284,7 +291,7 @@ class BaseTask:
                         result_new.append(res)
                 result = result_new
 
-            json.dump(result, open(final_result_file, "w"))
+            json.dump(result, open(final_result_file, "w"), indent=4)
             print("result file saved to %s" % final_result_file)
 
         return final_result_file
