@@ -472,6 +472,7 @@ class Blip2T5Instruct(Blip2Base):
                 length_penalty=length_penalty,
                 num_return_sequences=num_captions,
                 output_scores=True,
+                return_dict_in_generate=True,
             )
 
         return outputs
